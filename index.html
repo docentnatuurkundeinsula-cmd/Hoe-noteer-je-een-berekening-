@@ -1,0 +1,342 @@
+<!DOCTYPE html>
+<html lang="nl">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>HAVO 2 — Verplichte notatie oefenapp (alle varianten)</title>
+<style>
+  :root{
+    --accent:#1f6feb; --ok:#198754; --bad:#d2342a; --ink:#0b1020;
+    --muted:#5b6472; --bg:#f6f8fb; --card:#ffffff; --shadow:0 6px 24px rgba(0,0,0,.08);
+    --radius:18px;
+  }
+  html,body{margin:0;height:100%;font-family:system-ui,-apple-system,Segoe UI,Roboto,Ubuntu,"Helvetica Neue",Arial,sans-serif;background:var(--bg);color:var(--ink);}
+  .wrap{max-width:1200px;margin:32px auto;padding:0 20px;}
+  header{display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;gap:12px;flex-wrap:wrap}
+  h1{font-size:clamp(20px,3vw,28px);margin:0}
+  .controls{display:flex;gap:10px;flex-wrap:wrap;align-items:center}
+  button,.chip,select.top{
+    border:0;border-radius:12px;padding:10px 14px;background:var(--accent);color:#fff;
+    font-weight:600;cursor:pointer;box-shadow:var(--shadow);
+  }
+  select.top{background:#eef2ff;color:#1b2a55}
+  button.secondary{background:#e9eef9;color:#14365d}
+  .chip{background:#eef2ff;color:#1b2a55}
+  .grid{display:grid;grid-template-columns: 1fr 1fr;gap:18px;align-items:start;}
+  .panel{background:var(--card);border-radius:var(--radius);box-shadow:var(--shadow);padding:18px 20px;}
+  .title{font-weight:800;font-size:16px;margin-bottom:6px;border-bottom:3px solid #111;padding-bottom:6px;}
+  .block{margin:12px 0 0}
+  .row{display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin:8px 0}
+  label{font-weight:700}
+  select{
+    width:100%;padding:10px 12px;border-radius:12px;border:1px solid #cbd5e1;background:#fbfcff;
+    font-size:16px;outline:none;appearance:none;background-image:url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24"><path d="M7 10l5 5 5-5z" fill="%23667"/></svg>');background-repeat:no-repeat;background-position:right 10px center;
+  }
+  .two-col{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+  .badge{font-weight:800;border-bottom:3px solid #111;display:inline-block;margin-bottom:6px}
+  .formula{font-size:24px;font-weight:800;margin:4px 0 0 0}
+  .feedback{font-size:14px;margin-top:6px}
+  .ok{color:var(--ok)} .bad{color:var(--bad)}
+  .question{font-size:18px;margin:0 0 10px 0;color:var(--muted)}
+  .answer{font-size:20px;font-weight:800;text-decoration:underline;margin-top:4px}
+  .footer{margin-top:18px;color:var(--muted);font-size:13px}
+  .sep{height:1px;background:#e6e9f2;margin:10px 0 0}
+  @media (max-width:900px){.grid{grid-template-columns:1fr}}
+</style>
+</head>
+<body>
+  <div class="wrap">
+    <header>
+      <h1>HAVO 2 — Oefenen: verplichte notatie (alle varianten)</h1>
+      <div class="controls">
+        <select id="setSelect" class="top" title="Kies formule-set">
+          <option value="density" selected>Dichtheid — ρ = m / V</option>
+          <option value="speed">Snelheid — v = s / t</option>
+        </select>
+        <select id="variantSelect" class="top" title="Kies welke grootheid gevraagd wordt">
+          <option value="random" selected>Variant: willekeurig</option>
+        </select>
+        <button id="new">Nieuwe opgave</button>
+        <button id="check" class="secondary">Controleer</button>
+        <button id="reset" class="secondary">Wis selectie</button>
+        <span class="chip" id="score">Score: 0/0</span>
+      </div>
+    </header>
+
+    <div class="panel">
+      <div class="question" id="vraag">—</div>
+      <div class="grid">
+        <!-- Left -->
+        <div class="panel">
+          <div class="title">gegevens / gevraagd / SI-check</div>
+
+          <div class="block">
+            <div class="row"><label>Gegeven 1:</label></div>
+            <div class="two-col">
+              <select id="g1"></select>
+              <select id="g1si"></select>
+            </div>
+            <div class="feedback" id="fb-g1"></div>
+          </div>
+
+          <div class="block">
+            <div class="row"><label>Gegeven 2:</label></div>
+            <div class="two-col">
+              <select id="g2"></select>
+              <select id="g2si"></select>
+            </div>
+            <div class="feedback" id="fb-g2"></div>
+          </div>
+
+          <div class="block">
+            <div class="row"><label>Gevraagd:</label></div>
+            <select id="gevraagd"></select>
+            <div class="feedback" id="fb-gevraagd"></div>
+          </div>
+        </div>
+
+        <!-- Right -->
+        <div class="panel">
+          <div class="title">formule / berekening / antwoord in een zin</div>
+
+          <div class="block">
+            <div class="badge">formule</div>
+            <div class="formula">
+              <select id="formule"></select>
+            </div>
+            <div class="feedback" id="fb-formule"></div>
+          </div>
+
+          <div class="block">
+            <div class="badge">berekening</div>
+            <select id="berekening"></select>
+            <div class="feedback" id="fb-berekening"></div>
+          </div>
+
+          <div class="block">
+            <div class="badge">antwoord in één zin</div>
+            <div class="answer">
+              <select id="antwoord"></select>
+            </div>
+            <div class="feedback" id="fb-antwoord"></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="footer">
+        Doel: dwing de notatie af. Kies in elk blok de juiste optie. De score telt alleen bij volledig correcte uitwerking.
+        <div class="sep"></div>
+        <div class="small">Set-keuze en variant staan bovenaan. Nu beschikbaar: Dichtheid (ρ,m,V) en Snelheid (v,s,t). Uit te breiden met meer sets.</div>
+      </div>
+    </div>
+  </div>
+
+<script>
+const fmt = (x) => String(x).replace('.',',');
+const scoreEl = document.getElementById('score');
+const vraagEl = document.getElementById('vraag');
+const setSelect = document.getElementById('setSelect');
+const variantSelect = document.getElementById('variantSelect');
+
+let attempts = 0, correctCount = 0;
+let state = { set:'density', unknown:'rho', correct:{} };
+
+function randRange(a,b,dec=0){ return +( (Math.random()*(b-a)+a).toFixed(dec) ); }
+function shuffle(arr){ for(let i=arr.length-1;i>0;i--){ const j=Math.floor(Math.random()*(i+1)); [arr[i],arr[j]]=[arr[j],arr[i]];} return arr; }
+function option(el, text, value){ const o=document.createElement('option'); o.textContent=text; o.value=value??text; el.appendChild(o); }
+function fillSelect(id, options){ const el = document.getElementById(id); el.innerHTML=''; el.insertAdjacentHTML('afterbegin','<option value="" selected disabled>— kies —</option>'); shuffle(options).forEach(x=>option(el,x,x)); }
+
+function updateVariantOptions(){
+  variantSelect.innerHTML='';
+  option(variantSelect,'Variant: willekeurig','random');
+  if(state.set==='density'){
+    option(variantSelect,'Gevraagd: ρ','rho');
+    option(variantSelect,'Gevraagd: m','m');
+    option(variantSelect,'Gevraagd: V','V');
+  } else if(state.set==='speed'){
+    option(variantSelect,'Gevraagd: v','v');
+    option(variantSelect,'Gevraagd: s','s');
+    option(variantSelect,'Gevraagd: t','t');
+  }
+  variantSelect.value='random';
+}
+
+setSelect.addEventListener('change', ()=>{
+  state.set = setSelect.value;
+  updateVariantOptions();
+  newProblem();
+});
+variantSelect.addEventListener('change', ()=>{
+  newProblem();
+});
+
+function buildDensity(){
+  // choose unknown
+  const unk = (variantSelect.value==='random') ? shuffle(['rho','m','V'])[0] : variantSelect.value;
+  // values in SI
+  const m = randRange(2,9,1);
+  const V = randRange(0.10,0.75,2);
+  const rho = +(m/V).toFixed(2);
+  // compute given based on unknown
+  let given1, given2, asked, formulaCorr, calcCorr, answerCorr;
+  if(unk==='rho'){
+    given1 = `m = ${fmt(m)} kg`; given2 = `V = ${fmt(V)} m³`; asked = 'ρ = ?   kg/m³';
+    formulaCorr = 'ρ = m / V';
+    calcCorr = `ρ = ${fmt(m)} kg / ${fmt(V)} m³ = ${fmt(rho)} kg/m³`;
+    answerCorr = `De dichtheid van het blok is ${fmt(rho)} kg/m³`;
+  } else if(unk==='m'){
+    given1 = `ρ = ${fmt(rho)} kg/m³`; given2 = `V = ${fmt(V)} m³`; asked = 'm = ?   kg';
+    formulaCorr = 'm = ρ · V';
+    const mcalc = m.toFixed(1).replace('.',',');
+    calcCorr = `m = ${fmt(rho)} kg/m³ · ${fmt(V)} m³ = ${mcalc} kg`;
+    answerCorr = `De massa van het blok is ${mcalc} kg`;
+  } else { // V unknown
+    given1 = `m = ${fmt(m)} kg`; given2 = `ρ = ${fmt(rho)} kg/m³`; asked = 'V = ?   m³';
+    formulaCorr = 'V = m / ρ';
+    const Vcalc = V.toFixed(2).replace('.',',');
+    calcCorr = `V = ${fmt(m)} kg / ${fmt(rho)} kg/m³ = ${Vcalc} m³`;
+    answerCorr = `Het volume van het blok is ${Vcalc} m³`;
+  }
+  // SI options
+  const si1 = given1.includes('kg/m³')? 'kg/m³' : (given1.includes('kg')? 'kg' : 'm³');
+  const si2 = given2.includes('kg/m³')? 'kg/m³' : (given2.includes('kg')? 'kg' : 'm³');
+  // distractors
+  const g1opts = shuffle([given1, given1.replace('kg','N'), given1.replace('m³','cm³'), given1.replace('ρ','p').replace('V','v').replace('m','M')]);
+  const g2opts = shuffle([given2, given2.replace('kg','N'), given2.replace('m³','L'), given2.replace('ρ','p').replace('V','v').replace('m','M')]);
+  const siOpts = (u)=> shuffle([u, 'g', 'cm³', 'm/s', 'Pa', 'ton']);
+  const gevOpts = shuffle([asked, 'ρ = ?   kg/m³','m = ?   kg','V = ?   m³']);
+  const formOpts = shuffle([formulaCorr,'ρ = V / m','ρ = m · V','m = ρ / V','V = ρ · m']);
+  const berOpts = shuffle([calcCorr,
+      calcCorr.replace('/','·').replace('kg/m³','kg·m³'),
+      calcCorr.replace('kg/m³','g/cm³'),
+      calcCorr.replace(' = ',' = ').replace(/= .*$/,' = 0,00'),
+      calcCorr.replace(/([0-9]+,[0-9]+).+$/, '$1 kg/m³')
+  ]);
+  const antOpts = shuffle([answerCorr,
+      answerCorr.replace('kg/m³','g/cm³'),
+      answerCorr.replace(/(massa|volume|dichtheid)/,'waarde'),
+      'Ik weet het niet',
+      answerCorr.replace(/[0-9]+,[0-9]+/,'0,00')
+  ]);
+
+  return {
+    statement: `Gegeven: ${given1} en ${given2}. Bereken ${asked.split('=')[0].trim()} in SI-eenheden.`,
+    g1opts, g2opts, g1si: siOpts(si1), g2si: siOpts(si2),
+    gevOpts, formOpts, berOpts, antOpts,
+    correct: { g1:given1, g1si:si1, g2:given2, g2si:si2, gev:asked, formule:formulaCorr, berekening:calcCorr, antwoord:answerCorr }
+  };
+}
+
+function buildSpeed(){
+  const unk = (variantSelect.value==='random') ? shuffle(['v','s','t'])[0] : variantSelect.value;
+  const v = randRange(2,30,0);     // m/s
+  const t = randRange(3,40,0);     // s
+  const s = +(v*t).toFixed(0);     // m
+  let given1, given2, asked, formulaCorr, calcCorr, answerCorr;
+  if(unk==='v'){
+    given1 = `s = ${s} m`; given2 = `t = ${t} s`; asked='v = ?   m/s';
+    formulaCorr = 'v = s / t';
+    const res = (s/t).toFixed(2).replace('.',',');
+    calcCorr = `v = ${s} m / ${t} s = ${res} m/s`;
+    answerCorr = `De snelheid is ${res} m/s`;
+  } else if(unk==='s'){
+    given1 = `v = ${v} m/s`; given2 = `t = ${t} s`; asked='s = ?   m';
+    formulaCorr = 's = v · t';
+    const res = (v*t).toFixed(0);
+    calcCorr = `s = ${v} m/s · ${t} s = ${res} m`;
+    answerCorr = `De afstand is ${res} m`;
+  } else {
+    given1 = `s = ${s} m`; given2 = `v = ${v} m/s`; asked='t = ?   s';
+    formulaCorr = 't = s / v';
+    const res = (s/v).toFixed(2).replace('.',',');
+    calcCorr = `t = ${s} m / ${v} m/s = ${res} s`;
+    answerCorr = `De tijd is ${res} s`;
+  }
+  const si1 = given1.includes('m/s')? 'm/s' : (given1.includes(' m')? 'm' : 's');
+  const si2 = given2.includes('m/s')? 'm/s' : (given2.includes(' m')? 'm' : 's');
+
+  const g1opts = shuffle([given1, given1.replace('m/s','km/h'), given1.replace(' m',' cm'), given1.replace('v','u').replace('s =','S =')]);
+  const g2opts = shuffle([given2, given2.replace('m/s','km/h'), given2.replace(' s',' min'), given2.replace('v','u').replace('t =','T =')]);
+  const siOpts = (u)=> shuffle([u, 'km/h', 'min', 'cm', 'kg']);
+  const gevOpts = shuffle([asked,'v = ?   m/s','s = ?   m','t = ?   s']);
+  const formOpts = shuffle([formulaCorr,'v = t / s','s = v / t','t = v · s','v = s · t']);
+  const berOpts = shuffle([calcCorr,
+      calcCorr.replace('/','·'),
+      calcCorr.replace(/m\/s/g,'km/h'),
+      calcCorr.replace(/[0-9]+,[0-9]+|[0-9]+$/,'0'),
+  ]);
+  const antOpts = shuffle([answerCorr,
+      answerCorr.replace(/m\/s|m|s/,'km/h'),
+      'Geen idee',
+      answerCorr.replace(/[0-9]+,[0-9]+|[0-9]+/,'0')
+  ]);
+
+  return {
+    statement: `Gegeven: ${given1} en ${given2}. Bereken ${asked.split('=')[0].trim()} in SI-eenheden.`,
+    g1opts, g2opts, g1si: siOpts(si1), g2si: siOpts(si2),
+    gevOpts, formOpts, berOpts, antOpts,
+    correct: { g1:given1, g1si:si1, g2:given2, g2si:si2, gev:asked, formule:formulaCorr, berekening:calcCorr, antwoord:answerCorr }
+  };
+}
+
+function buildProblem(){
+  return (state.set==='density') ? buildDensity() : buildSpeed();
+}
+
+function newProblem(){
+  const data = buildProblem();
+  state.correct = data.correct;
+  vraagEl.textContent = data.statement;
+  fillSelect('g1', data.g1opts);
+  fillSelect('g1si', data.g1si);
+  fillSelect('g2', data.g2opts);
+  fillSelect('g2si', data.g2si);
+  fillSelect('gevraagd', data.gevOpts);
+  fillSelect('formule', data.formOpts);
+  fillSelect('berekening', data.berOpts);
+  fillSelect('antwoord', data.antOpts);
+  // clear feedback
+  ['fb-g1','fb-g2','fb-gevraagd','fb-formule','fb-berekening','fb-antwoord'].forEach(id=>document.getElementById(id).textContent='');
+}
+
+function check(){
+  attempts++;
+  function fb(id, ok, tip){
+    document.getElementById(id).innerHTML = ok ? `<span class="ok">✔</span>` : `<span class="bad">✖ ${tip}</span>`;
+  }
+  const c = state.correct;
+  const ok1  = document.getElementById('g1').value === c.g1;
+  const ok1s = document.getElementById('g1si').value === c.g1si;
+  fb('fb-g1', ok1 && ok1s, `Kies: “${c.g1}” met SI “${c.g1si}”.`);
+
+  const ok2  = document.getElementById('g2').value === c.g2;
+  const ok2s = document.getElementById('g2si').value === c.g2si;
+  fb('fb-g2', ok2 && ok2s, `Kies: “${c.g2}” met SI “${c.g2si}”.`);
+
+  const okG = document.getElementById('gevraagd').value === c.gev;
+  fb('fb-gevraagd', okG, `Gevraagd: “${c.gev}”.`);
+
+  const okF = document.getElementById('formule').value === c.formule;
+  fb('fb-formule', okF, `Formule: “${c.formule}”.`);
+
+  const okB = document.getElementById('berekening').value === c.berekening;
+  fb('fb-berekening', okB, `Berekening: “${c.berekening}”.`);
+
+  const okA = document.getElementById('antwoord').value === c.antwoord;
+  fb('fb-antwoord', okA, `Antwoord: “${c.antwoord}”.`);
+
+  const allOk = ok1 && ok1s && ok2 && ok2s && okG && okF && okB && okA;
+  if(allOk) correctCount++;
+  scoreEl.textContent = `Score: ${correctCount}/${attempts}`;
+}
+
+document.getElementById('new').addEventListener('click', newProblem);
+document.getElementById('check').addEventListener('click', check);
+document.getElementById('reset').addEventListener('click', newProblem);
+
+// init
+updateVariantOptions();
+newProblem();
+</script>
+</body>
+</html>
